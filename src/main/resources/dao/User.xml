@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao">
+    <select id="selectByqq" resultType="User" parameterType="User">
+        select * from USER where qq=#{qq}
+    </select>
+    <insert id="inPeriod" parameterType="User">
+        insert into user(qq,period_id,week) values(#{qq},#{period_id},#{week})
+    </insert>
+    <select id="selectByqqAndPeriod_id" resultType="int">
+        select count(1) from USER  where qq=#{qq} and period_id=#{period_id}
+    </select>
+    <delete id="deleteByqqAndPeriod_id" parameterType="User">
+        delete from user where qq=#{qq} and period_id=#{period_id}
+    </delete>
+    <select id="selectAll" resultType="User">
+        select a.qq qq,a.period_id period_id,a.week week,b.count from user a
+        left join (
+        select count(1) count,qq from user where  period_id>=date_format(date_sub(curdate(),interval 14 day),"%Y%m%d") group by qq ) b
+        on a.qq=b.qq
+        order by qq desc
+    </select>
+</mapper>
