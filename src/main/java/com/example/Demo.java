@@ -42,12 +42,6 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public static void main(String[] args) throws Exception {
 
-        /*ToInterface ti=new ToInterface();
-
-        String str=ti.interfaceUtil("http://tcc.taobao.com/cc/json/mobile_tel_segment.htm?tel=18856968369","");
-        System.out.println(str);
-        JSONObject object = JSONObject.parseObject(str);
-        System.out.println(object.get("telString"));*/
         // CQ此变量为特殊变量，在JCQ启动时实例化赋值给每个插件，而在测试中可以用CQDebug类来代替他
         CQ = new CQDebug();//new CQDebug("应用目录","应用名称") 可以用此构造器初始化应用的目录
         CQ.logInfo("[JCQ] TEST Demo", "测试启动");// 现在就可以用CQ变量来执行任何想要的操作了
@@ -112,7 +106,7 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 应用的所有数据、配置【必须】存放于此目录，避免给用户带来困扰。
         sqlSession=getSqlSession();
          i=1;
-            CQ.sendGroupMsg(930684981, "小可爱们，我来啦！");
+         CQ.sendGroupMsg(930684981, "小可爱们，我来啦！");
         TimerManager timerManager =new TimerManager();
         timerManager.TimerManager1();
         timerManager.TimerManager2();
@@ -330,63 +324,10 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         }else if ("github".equals(msg)){
             CQ.sendGroupMsg(fromGroup,"https://github.com/hqxyhc/-q-");
         }
-      /*  else if("定时".equals(msg)){
-            i++;
-            System.out.println("定时"+i);
-        }else if(getWeek().equals("星期六")||getWeek().equals("星期日")){
-            System.out.println(getTimeStringAll());
-        }*/
-
-
-        /*
-        * 增加统计已经连续请假俩次功能
-        * */
-
-
-        /*
-        * 1.生成人物
-        * 2.等级：
-        *       1.1-10级10,20,40,80,160,320,640,1000,1500,2500
-        *       2.11-20级5000,7000,9000,11000,13000,15000+2000
-        *       3.+3000.。。。
-        * 3.竞速:
-        *       1.D车一个图180秒 初级驾照 一局100经验 10点券
-        *       2.C车一个图160秒 中级驾照 一局150经验 20点券
-        *       3.B车一个图140秒 高级驾照 一局300经验 50点券
-        *       4.A车一个图100秒 职业驾照 一局600经验 100点券
-        * 4.技巧：
-        *       1.学会飘移、cw、wc减1秒  发动一次
-        *       2.学会cww、wcw减2秒      发动一次
-        * 5.宝石：
-        *       1、2、3、4级
-        * 6.休闲区
-        *
-        * */
-        /*if("飞车".equals(msg)){
-            CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
-                    "\n生成角色 ：创建角色-男\\女-昵称" +
-                    "\n休闲区：进入休闲区、挂机、停止挂机、钓鱼、提竿");
-        }*/
-//        try {
-//            Thread.currentThread().sleep(1000 * 60 * 60 * 24);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        mt.timer4();
-//        sqlSession.clearCache();
-        sqlSession.commit();
-//        sqlSession.close();
-       /* t.cancel();*/
-       /* try {
-            myThread.circle(t);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
         return MSG_IGNORE;
 
-
     }
-
+    /*通过url获取一言*/
     private String one(long fromGroup, long fromQQ) {
        /* CQ = new CQDebug();//new CQDebug("应用目录","应用名称") 可以用此构造器初始化应用的目录
         CQ.logInfo("[JCQ] TEST Demo", "测试启动");// 现在就可以用CQ变量来执行任何想要的操作了*/
@@ -416,7 +357,7 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         }
         return null;
     }
-
+    /*获取星期几*/
     public String getWeek() {
         Date date=new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
