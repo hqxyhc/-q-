@@ -323,6 +323,8 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }
         }else if("一言".equals(msg)){
             one(fromGroup, fromQQ);
+        }else if ("github".equals(msg)){
+            CQ.sendGroupMsg(fromGroup,"");
         }
       /*  else if("定时".equals(msg)){
             i++;
