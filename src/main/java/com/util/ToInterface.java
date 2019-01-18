@@ -33,7 +33,7 @@ public class ToInterface {
        /* }*/
 
         //直到getInputStream()方法调用请求才真正发送出去
-        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(),"utf-8"));
         StringBuilder sb = new StringBuilder();
         String line;
         while((line=br.readLine()) != null){

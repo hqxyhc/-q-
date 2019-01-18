@@ -7,6 +7,7 @@ import javafx.concurrent.Task;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class TimerManager {
 
@@ -15,7 +16,7 @@ public class TimerManager {
      */
     public static void main(String[] args) {
         TimerManager timerManager =new TimerManager();
-        timerManager.TimerManager1();
+        timerManager.TimerManager2();
     }
 
     //时间间隔(一天)
@@ -56,10 +57,22 @@ public class TimerManager {
     }
 
     public void TimerManager2() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 1); //凌晨1点
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date date=calendar.getTime(); //第一次执行定时任务的时间
         Timer timer = new Timer();
         TimeTask timeTask=new TimeTask();
         //安排指定的任务在指定的时间开始进行重复的固定延迟执行。
-        timer.schedule(timeTask,10 * 60 * 1000);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Demo demo=new Demo();
+                demo.groupMsg(0, 10006, 930684981L, 2387020215L, "", "一言", 0);
+            }
+        }, date, 1000*60*10);
+
     }
     // 增加或减少天数
     public Date addDay(Date date, int num) {

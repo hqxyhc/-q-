@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.pojo.User;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
+import com.util.TimerManager;
 import com.util.ToInterface;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -66,7 +67,7 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         // 模拟群聊消息
         // 开始模拟群聊消息
         demo.groupMsg(0, 10006, 3456789012L, 3333333334L, "", "一言", 0);
-        demo.groupMsg(0, 10008, 3456789012L, 11111111114L, "", "", 0);
+        demo.groupMsg(0, 10008, 3456789012L, 11111111114L, "", "定时任务", 0);
         demo.groupMsg(0, 10009, 427984429L, 2387020215L, "", "所有", 0);
         demo.groupMsg(0, 10010, 427984429L, 3333333334L, "", "所有", 0);
         demo.groupMsg(0, 10011, 427984429L, 11111111114L, "", "qwq 有没有一起开的\n[CQ:at,qq=3333333334]你玩嘛", 0);
@@ -112,6 +113,9 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         sqlSession=getSqlSession();
          i=1;
             CQ.sendGroupMsg(930684981, "小可爱们，我来啦！");
+        TimerManager timerManager =new TimerManager();
+        timerManager.TimerManager1();
+        timerManager.TimerManager2();
         return 0;
 
     }
@@ -324,7 +328,7 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         }else if("一言".equals(msg)){
             one(fromGroup, fromQQ);
         }else if ("github".equals(msg)){
-            CQ.sendGroupMsg(fromGroup,"");
+            CQ.sendGroupMsg(fromGroup,"https://github.com/hqxyhc/-q-");
         }
       /*  else if("定时".equals(msg)){
             i++;
@@ -384,18 +388,19 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
     }
 
     private String one(long fromGroup, long fromQQ) {
+       /* CQ = new CQDebug();//new CQDebug("应用目录","应用名称") 可以用此构造器初始化应用的目录
+        CQ.logInfo("[JCQ] TEST Demo", "测试启动");// 现在就可以用CQ变量来执行任何想要的操作了*/
         String urlString2 = "https://v1.hitokoto.cn/?encode=json";
         ToInterface hcu = new ToInterface();
-        JSONObject my = null;
         String str="";
         try {
-            my = (JSONObject) JSONObject.parse(hcu.doGet(urlString2).toString());
+            JSONObject my = (JSONObject) JSONObject.parse(hcu.doGet(urlString2).toString());
             str="\n" + my.get("hitokoto") ;
+            CQ.sendGroupMsg(fromGroup,
+                    "\n" + my.get("hitokoto") + "\n来源：" + my.get("from")+"\n当前时间："+getTimeStringAll());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
-                "\n" + my.get("hitokoto") + "\n来源：" + my.get("from")+"\n当前时间："+getTimeStringAll());
         return str;
     }
 
