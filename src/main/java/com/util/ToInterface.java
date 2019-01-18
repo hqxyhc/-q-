@@ -1,68 +1,92 @@
 package com.util;
+
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-/**
- * @author 包福平
- * @QQ:1140913970
- */
+import java.net.URLEncoder;
+
 public class ToInterface {
-    /**
-     * 调用对方接口方法
-     * @param path 对方或第三方提供的路径
-     * @param data 向对方或第三方发送的数据，大多数情况下给对方发送JSON数据让对方解析
-     */
-    public static String interfaceUtil(String path,String data) {
-        String str = "";
-        try {
-            URL url = new URL(path);
-            //打开和url之间的连接
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            PrintWriter out = null;
-            //请求方式
-            conn.setRequestMethod("POST");
-//           //设置通用的请求属性
-            conn.setRequestProperty("accept", "*/*");
-            conn.setRequestProperty("connection", "Keep-Alive");
-            conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
-            conn.setRequestProperty("content-type","application/json;charset=GBK");
-            //设置是否向httpUrlConnection输出，设置是否从httpUrlConnection读入，此外发送post请求必须设置这两个
-            //最常用的Http请求无非是get和post，get请求可以获取静态页面，也可以把参数放在URL字串后面，传递给servlet，
-            //post与get的 不同之处在于post的参数不是放在URL字串里面，而是放在http请求的正文内。
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            //获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
-            //发送请求参数即数据
-            out.print(data);
-            //缓冲数据
-            out.flush();
-            //获取URLConnection对象对应的输入流
-            InputStream is = conn.getInputStream();
-            //构造一个字符流缓存
-            BufferedReader br = new BufferedReader(new InputStreamReader(is,"gbk"));
-            while ((str = br.readLine()) != null) {
-                System.out.println(str);
-            }
-            //关闭流
-            is.close();
-            //断开连接，最好写上，disconnect是在底层tcp socket链接空闲时才切断。如果正在被其他线程使用就不切断。
-            //固定多线程的话，如果不disconnect，链接会增多，直到收发不出信息。写上disconnect后正常一些。
-            conn.disconnect();
-            System.out.println("完整结束");
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static final String urlString = "https://c.m.163.com/nc/article/headline/T1348647853363/0-40.html";  //先登录保存cookie
+    public static final String urlString2 = "https://v1.hitokoto.cn/?encode=json";
+    public String sessionId = "";
+    public StringBuilder doGet(String urlStr) throws IOException{
+        String key = "";
+        String cookieVal = "";
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//        cookieVal = "RK=sW5tyeg0sm; ptcz=d57344780baff653b9916f2ab47faef001ccf0d5d4f08c94aad21e6d0d2b32ae; pgv_pvi=7021795328; tvfe_boss_uuid=80a47f42a4cc12b6; pgv_pvid=2654649660; o_cookie=2387020215; pgv_si=s688740352; _qpsvr_localtk=0.2798671852074053; uin=o2387020215; skey=@yg0Kcw2Vr; ptisp=cnc; p_uin=o2387020215; pt4_token=f5MJmvi8G502UYOYnpVRfmBhIoHK711C-Q9rBSjUmq4_; p_skey=waGGLRWxBFZXc*1Mij38DyvaS8O-QYSRJgzDIPJd9JE_";
+//        connection.setRequestProperty("Cookie", cookieVal);
+        connection.connect(); //到此步只是建立与服务器的tcp连接，并未发送http请求
+        /**
+         * 设置cookie
+         */
+        /*if(!sessionId.equals("")){
+            connection.setRequestProperty("Cookie", sessionId);
         }
-        return str;
+        for(int i=1;(key=connection.getHeaderField(i))!=null;i++){*/
+
+       /* }*/
+
+        //直到getInputStream()方法调用请求才真正发送出去
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while((line=br.readLine()) != null){
+            sb.append(line);
+            sb.append("\n");
+        }
+
+
+       /* for(int i=0,len=strs.length;i<len;i++){
+            System.out.println(strs[i].toString());
+        }*/
+
+        br.close();
+        connection.disconnect();
+        return sb;
     }
 
-    public static void main(String[] args) {
-        interfaceUtil("http://tcc.taobao.com/cc/json/mobile_tel_segment.htm?tel=18856968369", "");
-//        interfaceUtil("http://192.168.10.89:8080/eoffice-restful/resources/sys/oadata", "usercode=10012");
-//        interfaceUtil("http://192.168.10.89:8080/eoffice-restful/resources/sys/oaholiday",
-//                    "floor=first&year=2017&month=9&isLeader=N");
+    public void doPost() throws IOException{
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setDoOutput(true); //设置连接输出流为true,默认false (post 请求是以流的方式隐式的传递参数)
+        connection.setDoInput(true); // 设置连接输入流为true
+        connection.setRequestMethod("POST"); // 设置请求方式为post
+        connection.setUseCaches(false); // post请求缓存设为false
+        connection.setInstanceFollowRedirects(true); //// 设置该HttpURLConnection实例是否自动执行重定向
+        // 设置请求头里面的各个属性 (以下为设置内容的类型,设置为经过urlEncoded编码过的from参数)
+        // application/x-javascript text/xml->xml数据 application/x-javascript->json对象 application/x-www-form-urlencoded->表单数据
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        connection.connect();
+
+        // 创建输入输出流,用于往连接里面输出携带的参数,(输出内容为?后面的内容)
+        DataOutputStream dataout = new DataOutputStream(connection.getOutputStream());
+        String parm = "storeId=" + URLEncoder.encode("32", "utf-8"); //URLEncoder.encode()方法  为字符串进行编码           
+        dataout.writeBytes(parm);
+        dataout.flush();
+        dataout.close(); // 重要且易忽略步骤 (关闭流,切记!)           
+        // 连接发起请求,处理服务器响应  (从连接获取到输入流并包装为bufferedReader)
+        BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line;
+        StringBuilder sb = new StringBuilder(); // 用来存储响应数据           
+        // 循环读取流,若不到结尾处
+        while ((line = bf.readLine()) != null) {
+            sb.append(bf.readLine());
+        }
+        bf.close();    // 重要且易忽略步骤 (关闭流,切记!)
+        connection.disconnect(); // 销毁连接
+        System.out.println(sb.toString());
+    }
+
+    public static void main(String[] args) throws IOException {
+        ToInterface hcu = new ToInterface();
+//        hcu.doGet(urlString);
+          JSONObject my= (JSONObject) JSONObject.parse(hcu.doGet(urlString2).toString());
+        System.out.println(my.get("hitokoto")+"\n来源："+my.get("from")+"\n"+"时间");
     }
 }

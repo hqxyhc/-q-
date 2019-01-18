@@ -1,11 +1,13 @@
 package com.example;
 
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Timer;
+import java.util.*;
+
+import com.alibaba.fastjson.JSONObject;
 import com.pojo.User;
 import com.sobte.cqp.jcq.entity.*;
 import com.sobte.cqp.jcq.event.JcqAppAbstract;
+import com.util.ToInterface;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -14,8 +16,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import javax.swing.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.Timer;
 
 /**
  * 本文件是JCQ插件的主类<br>
@@ -64,8 +65,8 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 //        demo.privateMsg(0, 10005, 3333333334L, "你好坏，都不理我QAQ", 0);
         // 模拟群聊消息
         // 开始模拟群聊消息
-        demo.groupMsg(0, 10006, 3456789012L, 3333333334L, "", "车队菜单", 0);
-        demo.groupMsg(0, 10008, 3456789012L, 11111111114L, "", "我要请假", 0);
+        demo.groupMsg(0, 10006, 3456789012L, 3333333334L, "", "一言", 0);
+        demo.groupMsg(0, 10008, 3456789012L, 11111111114L, "", "", 0);
         demo.groupMsg(0, 10009, 427984429L, 2387020215L, "", "所有", 0);
         demo.groupMsg(0, 10010, 427984429L, 3333333334L, "", "所有", 0);
         demo.groupMsg(0, 10011, 427984429L, 11111111114L, "", "qwq 有没有一起开的\n[CQ:at,qq=3333333334]你玩嘛", 0);
@@ -190,11 +191,15 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
     public int groupMsg(int subType, int msgId, long fromGroup, long fromQQ, String fromAnonymous, String msg,
                         int font) {
-        Timer t=new Timer();
+        /*获取mybaties*/
+        sqlSession=getSqlSession();
+        i=1;
         User u=new User();
-        MyThread myThread=new MyThread();
+        /*设置qq*/
         u.setQq(fromQQ);
+        /*设置时间*/
         u.setPeriod_id(getTimeString());
+        /*设置星期几*/
         u.setWeek(getWeek());
         count=sqlSession.selectOne("selectByqqAndPeriod_id",u);
         // 如果消息来自匿名者
@@ -230,23 +235,23 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             if(4<=day&&day<11){
                 CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
                         "\n现在是：\n" + str +
-                        "\n上午好，小可爱，一日之计在于晨，早上专心工作、学习，不要玩飞车哦！");
+                        "\n上午好:\n"+one(fromGroup,fromQQ));
             }else if(11<=day&&day<=13){
                 CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
                         "\n现在是：\n" + str +
-                        "\n中午好，小可爱，中午吃完饭，可以跑几局飞车哦！然后睡觉觉哦");
+                        "\n中午好：\n"+one(fromGroup,fromQQ));
             }else if(13<day&&day<18){
                 CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
                         "\n现在是：\n" + str +
-                        "\n小可爱，下午啦，睡午觉了吗？一起来飞车吧");
+                        "\n小可爱，下午啦：\n"+one(fromGroup,fromQQ));
             }else if(18<=day&&day<=22){
                 CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
                         "\n现在是：\n" + str +
-                        "\n亲爱的，晚上好，一天累了吧，和爸妈一起聊聊天，看看电视吧，飞车任务也不能忘哦");
+                        "\n亲爱的，晚上好：\n"+one(fromGroup,fromQQ));
             }else{
                 CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
                         "\n现在是：\n" + str +
-                        "\n哇，深夜了，快睡吧，身体最重要。");
+                        "\n哇，深夜了，快睡吧，身体最重要：\n"+one(fromGroup,fromQQ));
             }
 
         }else if("车队赛请假".equals(msg)||"请假".equals(msg)||msg.contains("请假")&& !"请假信息".equals(msg)&& !"取消请假".equals(msg)){
@@ -308,6 +313,16 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
                     "\n俩个星期内所有请假信息:\n" +str +
                     "\n俩个星期内只能请假俩次哦");
+        }else if("定时任务".equals(msg)){
+            if((getWeek().equals("星期六")||getWeek().equals("星期日"))&&(getTimeStringDay().equals(19))) {
+                CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
+                        "\n19.58进房打车队赛啦，不要压着8点的时间进。请假的直接在群里发请假2字就好。\n" +one(fromGroup,fromQQ)
+                        );
+            }else{
+                one(fromGroup, fromQQ);
+            }
+        }else if("一言".equals(msg)){
+            one(fromGroup, fromQQ);
         }
       /*  else if("定时".equals(msg)){
             i++;
@@ -364,6 +379,22 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         return MSG_IGNORE;
 
 
+    }
+
+    private String one(long fromGroup, long fromQQ) {
+        String urlString2 = "https://v1.hitokoto.cn/?encode=json";
+        ToInterface hcu = new ToInterface();
+        JSONObject my = null;
+        String str="";
+        try {
+            my = (JSONObject) JSONObject.parse(hcu.doGet(urlString2).toString());
+            str="\n" + my.get("hitokoto") ;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        CQ.sendGroupMsg(fromGroup, CC.at(fromQQ) +
+                "\n" + my.get("hitokoto") + "\n来源：" + my.get("from")+"\n当前时间："+getTimeStringAll());
+        return str;
     }
 
     public SqlSession getSqlSession() {
@@ -585,5 +616,6 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
         JOptionPane.showMessageDialog(null, "这是测试菜单B，可以在这里加载窗口");
         return 0;
     }
+
 
 }
