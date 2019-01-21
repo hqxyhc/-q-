@@ -11,8 +11,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class ToInterface {
-    public static final String urlString = "https://c.m.163.com/nc/article/headline/T1348647853363/0-40.html";  //先登录保存cookie
-    public static final String urlString2 = "https://v1.hitokoto.cn/?encode=json";
+    public static final String urlString = "https://meiriyiwen.com/random";  //先登录保存cookie
+    public static final String urlString2 = "https://m.okjike.com/officialMessages/5c448c04ff18fe008d271fb5?share_distinct_id=1686c4ae4da44d-088d50b50db73f-5d1f3b1c-1327104-1686c4ae4db5d9&share_depth=1";
     public String sessionId = "";
     public StringBuilder doGet(String urlStr) throws IOException{
         String key = "";
@@ -86,7 +86,10 @@ public class ToInterface {
     public static void main(String[] args) throws IOException {
         ToInterface hcu = new ToInterface();
 //        hcu.doGet(urlString);
+
+        System.out.println(hcu.doGet(urlString2).toString().split("<span data-v"));
           JSONObject my= (JSONObject) JSONObject.parse(hcu.doGet(urlString2).toString());
-        System.out.println(my.get("hitokoto")+"\n来源："+my.get("from")+"\n"+"时间");
+        /*System.out.println(my.get("hitokoto")+"\n来源："+my.get("from")+"\n"+"时间");*/
+        System.out.println(my);
     }
 }

@@ -319,11 +319,13 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             }else{
                 one(fromGroup, fromQQ);
             }
-        }else if("一言".equals(msg)){
+        }else if("1".equals(msg)){
             one(fromGroup, fromQQ);
-        }else if ("github".equals(msg)){
+        }else if ("git".equals(msg)){
             CQ.sendGroupMsg(fromGroup,"https://github.com/hqxyhc/-q-");
         }
+        sqlSession.commit();
+        sqlSession.close();
         return MSG_IGNORE;
 
     }
@@ -338,7 +340,7 @@ public class Demo extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
             JSONObject my = (JSONObject) JSONObject.parse(hcu.doGet(urlString2).toString());
             str="\n" + my.get("hitokoto") ;
             CQ.sendGroupMsg(fromGroup,
-                    "\n" + my.get("hitokoto") + "\n来源：" + my.get("from")+"\n当前时间："+getTimeStringAll());
+                     my.get("hitokoto") + "\n来源：" + my.get("from")+"\n当前时间："+getTimeStringAll());
         } catch (IOException e) {
             e.printStackTrace();
         }

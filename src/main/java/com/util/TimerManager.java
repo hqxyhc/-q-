@@ -2,7 +2,6 @@ package com.util;
 
 import com.example.Demo;
 import com.example.TimeTask;
-import javafx.concurrent.Task;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -41,7 +40,7 @@ public class TimerManager {
     /*双休车队赛*/
     public void TimerManager1() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 19); //凌晨1点
+        calendar.set(Calendar.HOUR_OF_DAY, 19);
         calendar.set(Calendar.MINUTE, 30);
         calendar.set(Calendar.SECOND, 00);
         Date date=calendar.getTime(); //第一次执行定时任务的时间
@@ -69,9 +68,9 @@ public class TimerManager {
             @Override
             public void run() {
                 Demo demo=new Demo();
-                demo.groupMsg(0, 10006, 930684981L, 2387020215L, "", "一言", 0);
+                demo.groupMsg(0, 10006, 930684981L, 2387020215L, "", "1", 0);
             }
-        }, date, 1000*60*10);
+        }, date, 1000*60*15);
 
     }
     // 增加或减少天数
